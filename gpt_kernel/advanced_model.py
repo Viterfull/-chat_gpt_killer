@@ -13,6 +13,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters = 200
 n_embd = 384
 dropout = 0.2
+n_head = 6
+n_layer = 4
 
 torch.manual_seed(1337)
 
@@ -79,7 +81,7 @@ class Head(nn.Module):
 
         wei = q @ k.transpose(-2, -1) * k.shape[-1]**-0.5 # (B, T, T)
         wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
-        wei = F.softmax(wei, dim=1)
+        wei = F.softmax(wei, dim=-1)
         wei = self.dropout(wei)
 
         v = self.value(x)
@@ -132,21 +134,16 @@ class Block(nn.Module):
 
         return x
 
-class GPTLanguageModel(nn.Module):
+class Decoder(nn.Module):
 
     def __init__(self):
         
         super().__init__()
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.position_embedding_table = nn.Embedding(block_size, n_embd)
-        self.lm_head = nn.Linear(n_embd, vocab_size)
+        self.blocks = nn.Sequential(*[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd)
-        self.blocks = nn.Sequential(
-            Block(n_embd, n_head=4),
-            Block(n_embd, n_head=4),
-            Block(n_embd, n_head=4),
-            nn.LayerNorm(n_embd),
-        )
+        self.lm_head = nn.Linear(n_embd, vocab_size)
 
         self.apply(self._init_weights)
 
@@ -192,28 +189,42 @@ class GPTLanguageModel(nn.Module):
 
         return idx
     
+class ModelTrainer:
+    
+    def __init__(self, model, lr, max_iters):
+        
+        self.learning_rate = lr
+        self.model = model
+        self.max_iters = max_iters
 
-model = GPTLanguageModel()
+    def train(self):
+
+        optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+
+        for iter in range(max_iters):
+
+            # every once in a while evaluate the loss on train and val sets
+            if iter % eval_interval == 0:
+                losses = estimate_loss()
+                print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+
+            # sample a batch of data
+            xb, yb = get_batch('train')
+
+            # evaluate the loss
+            logits, loss = model(xb, yb)
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            optimizer.step()
+
+
+model = Decoder()
 m = model.to(device)
 
 # create a PyTorch optimizer
-optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
-for iter in range(max_iters):
-
-    # every once in a while evaluate the loss on train and val sets
-    if iter % eval_interval == 0:
-        losses = estimate_loss()
-        print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
-
-    # sample a batch of data
-    xb, yb = get_batch('train')
-
-    # evaluate the loss
-    logits, loss = model(xb, yb)
-    optimizer.zero_grad(set_to_none=True)
-    loss.backward()
-    optimizer.step()
+trainer = ModelTrainer(m, learning_rate, max_iters)
+trainer.train()
 
 # generate from the model
 context = torch.zeros((1, 1), dtype=torch.long, device=device)
