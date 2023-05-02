@@ -2,6 +2,10 @@
 import torch
 import torch.nn as nn 
 from torch.nn import functional as F 
+from torchtext.datasets import Multi30k
+from torchtext.data import Field, BucketIterator
+from utils import translate_sentence, bleu, save_checkpoint, load_checkpoint
+import spacy
 
 # hyperparameters
 batch_size = 64
@@ -23,14 +27,41 @@ with open("input.txt", 'r', encoding='utf-8') as f:
     text = f.read()
 
 # fins unique chars
-chars = sorted(list(set(text)))
-vocab_size = len(chars)
+# chars = sorted(list(set(text)))
+# vocab_size = len(chars)
 
-# encoder and decoder for integers
-stoi = { ch:i for i,ch in enumerate(chars) }
-itos = { i:ch for i,ch in enumerate(chars) }
-encode = lambda s: [stoi[c] for c in s] # encoder: take a string, output a list of integers
-decode = lambda l: ''.join([itos[i] for i in l])
+# # encoder and decoder for integers
+# stoi = { ch:i for i,ch in enumerate(chars) }
+# itos = { i:ch for i,ch in enumerate(chars) }
+# encode = lambda s: [stoi[c] for c in s] # encoder: take a string, output a list of integers
+# decode = lambda l: ''.join([itos[i] for i in l])
+
+spacy_ger = spacy.load("de")
+spacy_eng = spacy.load("en")
+
+def tokenize_ger(text):
+    return [tok.text for tok in spacy_ger.tokenizer(text)]
+
+
+def tokenize_eng(text):
+    return [tok.text for tok in spacy_eng.tokenizer(text)]
+
+
+german = Field(tokenize=tokenize_ger, lower=True, init_token="<sos>", eos_token="<eos>")
+
+english = Field(
+    tokenize=tokenize_eng, lower=True, init_token="<sos>", eos_token="<eos>"
+)
+
+train_data, valid_data, test_data = Multi30k.splits(
+    exts=(".de", ".en"), fields=(german, english)
+)
+
+german.build_vocab(train_data, max_size=10000, min_freq=2)
+english.build_vocab(train_data, max_size=10000, min_freq=2)
+
+src_vocab_size = len(german.vocab)
+trg_vocab_size = len(english.vocab)
 
 # preparing data
 data = torch.tensor(encode(text), dtype=torch.long)
@@ -92,12 +123,14 @@ class Head(nn.Module):
 class MultiHeadAttention(nn.Module):
 
     def __init__(self, num_heads, head_size):
+
         super().__init__()
         self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
         self.proj = nn.Linear(head_size * num_heads, n_embd)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
+
         out = torch.cat([h(x) for h in self.heads], dim=-1)
         out = self.dropout(self.proj(out))
         return out
@@ -116,13 +149,14 @@ class FeedFoward(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-class Block(nn.Module):
+class DecoderBlock(nn.Module):
 
     def __init__(self, n_embd, n_head):
         
         super().__init__()
         head_size = n_embd // n_head
-        self.sa = MultiHeadAttention(n_head, head_size)
+        self.sa1 = MultiHeadAttention(n_head, head_size)
+        self.sa2 = MultiHeadAttention(n_head, head_size)
         self.ffwd = FeedFoward(n_embd)
         self.ln1 = nn.LayerNorm(n_embd)
         self.ln2 = nn.LayerNorm(n_embd)
@@ -139,11 +173,11 @@ class Decoder(nn.Module):
     def __init__(self):
         
         super().__init__()
-        self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
+        self.token_embedding_table = nn.Embedding(src_vocab_size, n_embd)
         self.position_embedding_table = nn.Embedding(block_size, n_embd)
-        self.blocks = nn.Sequential(*[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
+        self.blocks = nn.Sequential(*[DecoderBlock(n_embd, n_head=n_head) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd)
-        self.lm_head = nn.Linear(n_embd, vocab_size)
+        self.lm_head = nn.Linear(n_embd, src_vocab_size)
 
         self.apply(self._init_weights)
 
@@ -189,6 +223,68 @@ class Decoder(nn.Module):
 
         return idx
     
+class EncoderBlock(nn.Module):
+
+    def __init__(self, n_embd, n_head):
+        
+        super().__init__()
+        head_size = n_embd // n_head
+        self.sa = MultiHeadAttention(n_head, head_size)
+        self.ffwd = FeedFoward(n_embd)
+        self.ln1 = nn.LayerNorm(n_embd)
+        self.ln2 = nn.LayerNorm(n_embd)
+    
+    def forward(self, x):
+        
+        x = x + self.sa(self.ln1(x))
+        x = x + self.ffwd(self.ln2(x))
+
+        return x
+
+class Encoder(nn.Module):
+
+    def __init__(self):
+
+        super().__init__()
+        self.token_embedding_table = nn.Embedding(trg_vocab_size, n_embd)
+        self.position_embedding_table = nn.Embedding(block_size, n_embd)
+        self.blocks = nn.Sequential(*[EncoderBlock(n_embd, n_head=n_head) for _ in range(n_layer)])
+        self.ln_f = nn.LayerNorm(n_embd)
+        self.lm_head = nn.Linear(n_embd, trg_vocab_size)
+
+        self.apply(self._init_weights)
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+
+    def forward(self, idx, targets=None):
+        
+        B, T = idx.shape
+
+        tok_emb = self.token_embedding_table(idx) # (B, T, C)
+        pos_embd = self.position_embedding_table(torch.arange(T, device=device)) # (T, C)
+        x = tok_emb + pos_embd # (B, T, C)
+        x = self.blocks(x)
+        logits = self.lm_head(x) # (B, T, vocab_size)
+
+        if targets is None:
+            loss = None
+
+        else:
+            B, T, C = logits.shape
+            logits = logits.view(B*T, C)
+            targets = targets.view(B*T)
+            loss = F.cross_entropy(logits, targets)
+
+        return logits, loss
+
+    
+
 class ModelTrainer:
     
     def __init__(self, model, lr, max_iters):
