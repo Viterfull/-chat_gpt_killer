@@ -183,47 +183,25 @@ if __name__ == "__main__":
     with open(trg_file, 'r') as file:
         trg_sentences = file.readlines()
 
-    # trg_vocab = set()
-    # src_vocab = set()
+    trg_vocab = set()
+    src_vocab = set()
 
-    # for trg_sentence in trg_sentences:
-    #     trg_vocab.update(trg_sentence)
+    for trg_sentence in trg_sentences:
+        trg_vocab.update(trg_sentence)
 
-    # for src_sentence in src_sentences:
-    #     src_vocab.update(src_sentence)
+    for src_sentence in src_sentences:
+        src_vocab.update(src_sentence)
 
-    # trg_vocab = list(trg_vocab)
-    # src_vocab = list(src_vocab)
+    trg_vocab = list(trg_vocab)
+    src_vocab = list(src_vocab)
 
-    # trg_vocab.append(START_TOKEN)
-    # trg_vocab.append(END_TOKEN)
-    # trg_vocab.append(PADDING_TOKEN)
+    trg_vocab.append(START_TOKEN)
+    trg_vocab.append(END_TOKEN)
+    trg_vocab.append(PADDING_TOKEN)
 
-    # src_vocab.append(START_TOKEN)
-    # src_vocab.append(END_TOKEN)
+    src_vocab.append(START_TOKEN)
+    src_vocab.append(END_TOKEN)
     # src_vocab.append(PADDING_TOKEN)
-
-    trg_vocab = [START_TOKEN, ' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', 
-                      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '<', '=', '>', '?', 'ˌ', 
-                      'ँ', 'ఆ', 'ఇ', 'ా', 'ి', 'ీ', 'ు', 'ూ', 
-                      'ಅ', 'ಆ', 'ಇ', 'ಈ', 'ಉ', 'ಊ', 'ಋ', 'ೠ', 'ಌ', 'ಎ', 'ಏ', 'ಐ', 'ಒ', 'ಓ', 'ಔ', 
-                      'ಕ', 'ಖ', 'ಗ', 'ಘ', 'ಙ', 
-                      'ಚ', 'ಛ', 'ಜ', 'ಝ', 'ಞ', 
-                      'ಟ', 'ಠ', 'ಡ', 'ಢ', 'ಣ', 
-                      'ತ', 'ಥ', 'ದ', 'ಧ', 'ನ', 
-                      'ಪ', 'ಫ', 'ಬ', 'ಭ', 'ಮ', 
-                      'ಯ', 'ರ', 'ಱ', 'ಲ', 'ಳ', 'ವ', 'ಶ', 'ಷ', 'ಸ', 'ಹ', 
-                      '಼', 'ಽ', 'ಾ', 'ಿ', 'ೀ', 'ು', 'ೂ', 'ೃ', 'ೄ', 'ೆ', 'ೇ', 'ೈ', 'ೊ', 'ೋ', 'ೌ', '್', 'ೕ', 'ೖ', 'ೞ', 'ೣ', 'ಂ', 'ಃ', 
-                      '೦', '೧', '೨', '೩', '೪', '೫', '೬', '೭', '೮', '೯', PADDING_TOKEN, END_TOKEN]
-
-    src_vocab = [START_TOKEN, ' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', 
-                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                        ':', '<', '=', '>', '?', '@',
-                        '[', '\\', ']', '^', '_', '`', 
-                        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
-                        'y', 'z', 
-                        '{', '|', '}', '~', PADDING_TOKEN, END_TOKEN]
 
     index_to_trg = {k:v for k,v in enumerate(trg_vocab)}
     trg_to_index = {v:k for k,v in enumerate(trg_vocab)}
