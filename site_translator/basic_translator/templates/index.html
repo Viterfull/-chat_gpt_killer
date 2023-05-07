@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <form>
+	{% csrf_token %}
+	{{ input_form.as_p }}
+	{{ select_form_from.as_p }}
+	{{ select_form_to.as_p }}
+	
+  </form>
+
+  <label for="output">Output:</label>
+  <textarea id="output" rows="10" cols="50"></textarea>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+	$(document).ready(function() {
+	  $('form').on('keyup', function()  {
+		var input_data = $('#id_input_field').val();
+		var select_data_to = $('#id_select_field_to').val();
+		var select_data_from = $('#id_select_field_from').val();
+		$.ajax({
+		  url: '/ajax_request/',
+		  type: 'POST',
+		  data: {
+			'input_data': input_data,
+			'select_data_to': select_data_to,
+			'select_data_from': select_data_from,
+			'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+		  },
+		  dataType: 'json',
+		  success: function(data) {
+			$('#output').val(data.content.output_data);
+		  }
+		});
+		
+	  });
+	});
+  </script>
+
+{% endblock %}
+
