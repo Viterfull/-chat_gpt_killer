@@ -100,11 +100,20 @@ class SentenceEmbedding(nn.Module):
 
         def tokenize(sentence, start_token, end_token):
 
+            # print(f"sentence to tokenize: {sentence}")
+
+            # for token in list(sentence):
+            #     if (token == 'ｓ'):
+            #         print("PLOHOY TOKEN NAYDEN")
+
             sentence_word_indicies = [self.language_to_index[token] for token in list(sentence)]
+
             if start_token:
                 sentence_word_indicies.insert(0, self.language_to_index[self.START_TOKEN])
+            
             if end_token:
                 sentence_word_indicies.append(self.language_to_index[self.END_TOKEN])
+            
             for _ in range(len(sentence_word_indicies), self.max_sequence_length):
                 sentence_word_indicies.append(self.language_to_index[self.PADDING_TOKEN])
 
@@ -353,6 +362,7 @@ class Transformer(nn.Module):
                 trg_vocab_size,
                 src_to_index,
                 trg_to_index,
+                index_to_trg,
                 START_TOKEN, 
                 END_TOKEN, 
                 PADDING_TOKEN
@@ -361,6 +371,9 @@ class Transformer(nn.Module):
         super().__init__()
         self.max_sequence_length = max_sequence_length
         self.trg_vocab_size = trg_vocab_size
+
+        self.trg_to_index = trg_to_index
+        self.index_to_trg = index_to_trg
 
         self.PADDING_TOKEN = PADDING_TOKEN
         self.START_TOKEN = START_TOKEN

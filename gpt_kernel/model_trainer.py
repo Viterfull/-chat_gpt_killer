@@ -71,15 +71,15 @@ class ModelTrainer():
     
     def train(self, model, train_loader):
         
-        criterian = nn.CrossEntropyLoss(ignore_index=trg_to_index[model.PADDING_TOKEN],
+        criterian = nn.CrossEntropyLoss(ignore_index=model.trg_to_index[model.PADDING_TOKEN],
                             reduction='none')
 
         # When computing the loss, we are ignoring cases when the label is the padding token
-        for params in transformer.parameters():
+        for params in model.parameters():
             if params.dim() > 1:
                 nn.init.xavier_uniform_(params)
 
-        optim = torch.optim.Adam(transformer.parameters(), lr=1e-4)
+        optim = torch.optim.Adam(model.parameters(), lr=1e-4)
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
         model.train()
@@ -115,7 +115,7 @@ class ModelTrainer():
                     labels.view(-1).to(device)
                 ).to(device)
                 
-                valid_indicies = torch.where(labels.view(-1) == trg_to_index[model.PADDING_TOKEN], False, True)
+                valid_indicies = torch.where(labels.view(-1) == model.trg_to_index[model.PADDING_TOKEN], False, True)
                 loss = loss.sum() / valid_indicies.sum()
                 loss.backward()
                 optim.step()
@@ -125,24 +125,24 @@ class ModelTrainer():
                 if batch_num % 100 == 0:
                     
                     print(f"Iteration {batch_num} : {loss.item()}")
-                    print(f"English: {src_batch[0]}")
-                    print(f"Kannada Translation: {trg_batch[0]}")
+                    print(f"Source: {src_batch[0]}")
+                    print(f"Target Translation: {trg_batch[0]}")
 
                     trg_sentence_predicted = torch.argmax(trg_predictions[0], axis=1)
                     predicted_sentence = ""
 
                     for idx in trg_sentence_predicted:
                         
-                        if idx == trg_to_index[model.END_TOKEN]:
+                        if idx == model.trg_to_index[model.END_TOKEN]:
                             break
-                        predicted_sentence += index_to_trg[idx.item()]
+                        predicted_sentence += model.index_to_trg[idx.item()]
                         
                     print(f"Target Prediction: {predicted_sentence}")
 
 
                     model.eval()
                     trg_sentence = ("",)
-                    src_sentence = ("should we go to the mall?",)
+                    src_sentence = ("Привет, как дела?",)
 
                     for word_counter in range(model.max_sequence_length):
                         
@@ -158,42 +158,36 @@ class ModelTrainer():
                                                 dec_end_token=False)
                         next_token_prob_distribution = predictions[0][word_counter] # not actual probs
                         next_token_index = torch.argmax(next_token_prob_distribution).item()
-                        next_token = index_to_trg[next_token_index]
+                        next_token = model.index_to_trg[next_token_index]
                         trg_sentence = (trg_sentence[0] + next_token, )
                         if next_token == model.END_TOKEN:
                             break
                     
-                    print(f"Evaluation translation (should we go to the mall?) : {trg_sentence}")
+                    print(f"Evaluation translation (Привет, как дела?) : {trg_sentence}")
                     print("-------------------------------------------")
 
         return
 
-if __name__ == "__main__":
-    max_sequence_length = 200
-
+def create_translator(src_sentences, trg_sentences,max_sequence_length = 200):
+  
     START_TOKEN = '<START>'
     PADDING_TOKEN = '<PADDING>'
     END_TOKEN = '<END>'
 
-    src_file = "english.txt"
-    trg_file = "kannada.txt"
+    trg_vocab = list(set(' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ1234567890.,#!@"$;:^|\'-=+_—?<>'))
+    src_vocab = list(set(' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ1234567890.,#!@"$;:^|\'-=+_—?<>'))
 
-    with open(src_file, 'r') as file:
-        src_sentences = file.readlines()
-    with open(trg_file, 'r') as file:
-        trg_sentences = file.readlines()
+    # trg_vocab = set()
+    # src_vocab = set()
 
-    trg_vocab = set()
-    src_vocab = set()
+    # for trg_sentence in trg_sentences:
+    #     trg_vocab.update(trg_sentence)
 
-    for trg_sentence in trg_sentences:
-        trg_vocab.update(trg_sentence)
+    # for src_sentence in src_sentences:
+    #     src_vocab.update(src_sentence)
 
-    for src_sentence in src_sentences:
-        src_vocab.update(src_sentence)
-
-    trg_vocab = list(trg_vocab)
-    src_vocab = list(src_vocab)
+    # trg_vocab = list(trg_vocab)
+    # src_vocab = list(src_vocab)
 
     trg_vocab.append(START_TOKEN)
     trg_vocab.append(END_TOKEN)
@@ -201,14 +195,14 @@ if __name__ == "__main__":
 
     src_vocab.append(START_TOKEN)
     src_vocab.append(END_TOKEN)
-    # src_vocab.append(PADDING_TOKEN)
+    src_vocab.append(PADDING_TOKEN)
 
     index_to_trg = {k:v for k,v in enumerate(trg_vocab)}
     trg_to_index = {v:k for k,v in enumerate(trg_vocab)}
     index_to_src = {k:v for k,v in enumerate(src_vocab)}
     src_to_index = {v:k for k,v in enumerate(src_vocab)}
 
-    TOTAL_SENTENCES = 200000
+    TOTAL_SENTENCES = 500000
     src_sentences = src_sentences[:TOTAL_SENTENCES]
     trg_sentences = trg_sentences[:TOTAL_SENTENCES]
     src_sentences = [sentence.rstrip('\n').lower() for sentence in src_sentences]
@@ -219,22 +213,23 @@ if __name__ == "__main__":
     for index in range(len(trg_sentences)):
 
         trg_sentence, src_sentence = trg_sentences[index], src_sentences[index]
-        if is_valid_length(trg_sentence, max_sequence_length) \
-        and is_valid_length(src_sentence, max_sequence_length) \
-        and is_valid_tokens(trg_sentence, trg_vocab):
+        if is_valid_length(trg_sentence, max_sequence_length) and is_valid_length(src_sentence, max_sequence_length) and is_valid_tokens(trg_sentence, trg_vocab) and is_valid_tokens(src_sentence, src_vocab):
             valid_sentence_indicies.append(index)
 
     trg_sentences = [trg_sentences[i] for i in valid_sentence_indicies]
     src_sentences = [src_sentences[i] for i in valid_sentence_indicies]
 
     d_model = 512
-    batch_size = 30
+    batch_size = 25
     ffn_hidden = 2048
     num_heads = 8
-    drop_prob = 0.1
-    num_layers = 1
+    drop_prob = 0.2
+    num_layers = 2
     max_sequence_length = 200
-    kn_vocab_size = len(trg_vocab)
+    trg_vocab_size = len(trg_vocab)
+
+    print(f"Tagret_vocabulary: {sorted(trg_vocab)}")
+    print(f"Source_vabualry: {sorted(src_vocab)}")
 
     transformer = Transformer(d_model, 
                             ffn_hidden,
@@ -242,13 +237,14 @@ if __name__ == "__main__":
                             drop_prob, 
                             num_layers, 
                             max_sequence_length,
-                            kn_vocab_size,
+                            trg_vocab_size,
                             src_to_index,
                             trg_to_index,
+                            index_to_trg,
                             START_TOKEN, 
                             END_TOKEN, 
                             PADDING_TOKEN)
-
+    
     dataset = TextDataset(src_sentences, trg_sentences)
 
     train_loader = DataLoader(dataset, batch_size)
@@ -262,3 +258,5 @@ if __name__ == "__main__":
     trainer = ModelTrainer()
 
     trainer.train(transformer, train_loader)
+
+    return transformer
