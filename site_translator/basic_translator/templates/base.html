@@ -1,11 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{title}}</title>
+	<meta charset="utf-8">
+	<link rel="icon" href="icon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="background.css">
+	<link rel="stylesheet" href="main.css">
+	<title>Переводчик-киллер</title>
 </head>
 <body>
-	
-{% block content %}
-{% endblock %}
+	<div class="top-block"> <h1>Переводчик-киллер </h1></div>
+	<form class = "form-lang">
+		<select class = "form-list-1">
+			<option>Выберите язык</option>
+			<option>Русский</option>
+			<option>Английсий</option>
+			<option>Чешский</option>
+			<option>Немецкий</option>
+			<option>Французский</option>
+		</select>
+		<button class = "button">Перевести</button>
+		<select class = "form-list-2">
+			<option>Выберите язык</option>
+			<option>Русский</option>
+			<option>Английсий</option>
+			<option>Чешский</option>
+			<option>Немецкий</option>
+			<option>Французский</option>
+		</select>
+	</form>
+	<form>
+		<textarea placeholder="Введите текст" class="entry-field"></textarea>
+	</form>
 </body>
 </html>
