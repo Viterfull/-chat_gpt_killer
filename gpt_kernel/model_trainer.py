@@ -38,18 +38,18 @@ def create_masks(eng_batch, kn_batch):
 
 class TextDataset(Dataset):
 
-    def __init__(self, english_sentences, kannada_sentences):
+    def __init__(self, src_sentecnces, trg_sentences):
 
-        self.english_sentences = english_sentences
-        self.kannada_sentences = kannada_sentences
+        self.src_sentecnces = src_sentecnces
+        self.trg_sentences = trg_sentences
 
     def __len__(self):
         
-        return len(self.english_sentences)
+        return len(self.src_sentecnces)
 
     def __getitem__(self, idx):
         
-        return self.english_sentences[idx], self.kannada_sentences[idx]
+        return self.src_sentecnces[idx], self.trg_sentences[idx]
 
 def is_valid_tokens(sentence, vocab):
 
@@ -69,7 +69,7 @@ class ModelTrainer():
         
         pass
     
-    def train(self, model, train_loader):
+    def train(self, model, train_loader, test_sentence):
         
         criterian = nn.CrossEntropyLoss(ignore_index=model.trg_to_index[model.PADDING_TOKEN],
                             reduction='none')
@@ -142,11 +142,12 @@ class ModelTrainer():
 
                     model.eval()
                     trg_sentence = ("",)
-                    src_sentence = ("Привет, как дела?",)
+                    src_sentence = (test_sentence,)
 
                     for word_counter in range(model.max_sequence_length):
                         
                         encoder_self_attention_mask, decoder_self_attention_mask, decoder_cross_attention_mask = create_masks(src_sentence, trg_sentence)
+                        
                         predictions = model(src_sentence,
                                                 trg_sentence,
                                                 encoder_self_attention_mask.to(device), 
@@ -156,19 +157,22 @@ class ModelTrainer():
                                                 enc_end_token=False,
                                                 dec_start_token=True,
                                                 dec_end_token=False)
+                        
                         next_token_prob_distribution = predictions[0][word_counter] # not actual probs
                         next_token_index = torch.argmax(next_token_prob_distribution).item()
                         next_token = model.index_to_trg[next_token_index]
-                        trg_sentence = (trg_sentence[0] + next_token, )
+
                         if next_token == model.END_TOKEN:
                             break
+
+                        trg_sentence = (trg_sentence[0] + next_token, )
                     
-                    print(f"Evaluation translation (Привет, как дела?) : {trg_sentence}")
+                    print(f"Evaluation translation {src_sentence} : {trg_sentence}")
                     print("-------------------------------------------")
 
         return
 
-def create_translator(src_sentences, trg_sentences,max_sequence_length = 200):
+def create_translator(src_sentences, trg_sentences, test_sentence, max_sequence_length = 200):
   
     START_TOKEN = '<START>'
     PADDING_TOKEN = '<PADDING>'
@@ -202,7 +206,7 @@ def create_translator(src_sentences, trg_sentences,max_sequence_length = 200):
     index_to_src = {k:v for k,v in enumerate(src_vocab)}
     src_to_index = {v:k for k,v in enumerate(src_vocab)}
 
-    TOTAL_SENTENCES = 500000
+    TOTAL_SENTENCES = len(trg_sentences)
     src_sentences = src_sentences[:TOTAL_SENTENCES]
     trg_sentences = trg_sentences[:TOTAL_SENTENCES]
     src_sentences = [sentence.rstrip('\n').lower() for sentence in src_sentences]
@@ -220,7 +224,7 @@ def create_translator(src_sentences, trg_sentences,max_sequence_length = 200):
     src_sentences = [src_sentences[i] for i in valid_sentence_indicies]
 
     d_model = 512
-    batch_size = 25
+    batch_size = 50
     ffn_hidden = 2048
     num_heads = 8
     drop_prob = 0.2
@@ -250,13 +254,13 @@ def create_translator(src_sentences, trg_sentences,max_sequence_length = 200):
     train_loader = DataLoader(dataset, batch_size)
     iterator = iter(train_loader)
 
-    for batch_num, batch in enumerate(iterator):
-        print(batch)
-        if batch_num > 3:
-            break
+    # for batch_num, batch in enumerate(iterator):
+    #     print(batch)
+    #     if batch_num > 3:
+    #         break
 
     trainer = ModelTrainer()
 
-    trainer.train(transformer, train_loader)
+    trainer.train(transformer, train_loader, test_sentence)
 
     return transformer

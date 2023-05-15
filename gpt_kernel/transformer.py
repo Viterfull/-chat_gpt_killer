@@ -401,16 +401,18 @@ class Transformer(nn.Module):
 
         return out
     
-    def translate(self, transformer, src_sentence, trg_index_to_token):
+    def translate(self, src_sentence):
         
         self.eval()
         max_sequence_length = self.max_sequence_length
         device = get_device()
         src_sentence = (src_sentence,)
         trg_sentence = ("",)
+        
         for word_counter in range(max_sequence_length):
+
             encoder_self_attention_mask, decoder_self_attention_mask, decoder_cross_attention_mask=create_masks(src_sentence, trg_sentence)
-            predictions = transformer(src_sentence,
+            predictions = self(src_sentence,
                                     trg_sentence,
                                     encoder_self_attention_mask.to(device), 
                                     decoder_self_attention_mask.to(device), 
@@ -419,11 +421,14 @@ class Transformer(nn.Module):
                                     enc_end_token=False,
                                     dec_start_token=True,
                                     dec_end_token=False)
+            
             next_token_prob_distribution = predictions[0][word_counter]
             next_token_index = torch.argmax(next_token_prob_distribution).item()
-            next_token = trg_index_to_token[next_token_index]
-            kn_sentence = (kn_sentence[0] + next_token, )
+            next_token = self.index_to_trg[next_token_index]
+            
             if next_token == self.END_TOKEN:
                 break
-        return kn_sentence[0]
+
+            trg_sentence = (trg_sentence[0] + next_token, )
+        return trg_sentence[0]
 
