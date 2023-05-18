@@ -1,0 +1,1 @@
+/usr/bin/g++  -g   CMakeFiles/server.dir/server.cpp.o  -o server  /usr/lib/x86_64-linux-gnu/libpython3.8.so /usr/lib/x86_64-linux-gnu/libcpprest.so.2.10 -lpthread /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so 

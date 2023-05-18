@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/grigoriy/Рабочий стол/rest_server/build",
+  "command": "/usr/bin/g++  -DCPPREST_FORCE_HTTP_CLIENT_ASIO -DCPPREST_FORCE_HTTP_LISTENER_ASIO -DCPPREST_NO_SSL_LEAK_SUPPRESS -I/usr/include/python3.8  -g   -std=gnu++11 -o CMakeFiles/server.dir/server.cpp.o -c \"/home/grigoriy/Рабочий стол/rest_server/server.cpp\"",
+  "file": "/home/grigoriy/Рабочий стол/rest_server/server.cpp"
+}
+]

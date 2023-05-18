@@ -1,0 +1,3 @@
+/home/grigoriy/Рабочий стол/rest_server/build/CMakeFiles/rebuild_cache.dir
+/home/grigoriy/Рабочий стол/rest_server/build/CMakeFiles/edit_cache.dir
+/home/grigoriy/Рабочий стол/rest_server/build/CMakeFiles/server.dir

@@ -4,14 +4,61 @@
 
   <form>
 	{% csrf_token %}
-	{{ input_form.as_p }}
-	{{ select_form_from.as_p }}
-	{{ select_form_to.as_p }}
-	
+	<div class = "main-block-p">
+		<div class = main-block-c>
+			<div class = "container">
+				<div class = "select-field-from" >
+					<select id = "id_select_field_from">
+						<option disabled selected>Выберите язык</option>
+						<option value = "ru">Русский</option>
+						<option value = "en">Английский</option>
+						<option value = "ch">Чешский</option>
+						<option value = "h">Немецкий</option>
+						<option value = "f">Французский</option>
+					</select>
+					<textarea placeholder = "Введите текст..." id = "id_input_field"></textarea>
+				</div>
+			</div>
+			<div class="container">
+				<div class = "select-field-to">
+					<select id = "id_select_field_to">
+						<option disabled selected>Выберите язык</option>
+						<option value = "ru">Русский</option>
+						<option value = "en">Английский</option>
+						<option value = "ch">Чешский</option>
+						<option value = "h">Немецкий</option>
+						<option value = "f">Французский</option>
+					</select>
+					<textarea id="output"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="about"> 
+		<h1>О создателях</h1>
+		<div class = "Dima">
+			<h2>Дмитрий Глобин</h2>
+			<ul>
+				<li>AI researcher</li>
+				<li>Python</li>
+			</ul>
+		</div>
+		<div class = "Grisha">
+			<h2>Григорий Витер</h2>
+			<ul>
+				<li>Backend-developer</li>
+				<li>Python, Django</li>
+			</ul>
+		</div>
+		<div class = Misha>
+			<h2>Михаил Мандра</h2>
+			<ul>
+				<li>Frontend-developer</li>
+				<li>HTML, css</li>
+			</ul>
+		</div>
+	</div>
   </form>
-
-  <label for="output">Output:</label>
-  <textarea id="output" rows="10" cols="50"></textarea>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
