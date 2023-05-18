@@ -1,11 +1,11 @@
 #pragma once
 
 #include <torch/torch.h>
-#include <utils.hpp>
+#include "utils.hpp"
 
-class FeedFoward : public torch::nn::Module {
+class FeedForwardImpl : public torch::nn::Module {
 public:
-    FeedFowardImpl(int64_t d_model, int64_t hidden, double drop_prob = 0.2);
+    FeedForwardImpl(int64_t d_model, int64_t hidden, double drop_prob = 0.2);
 
     torch::Tensor forward(torch::Tensor x);
 
@@ -13,4 +13,4 @@ private:
     torch::nn::Sequential net;
 };
 
-TORCH_MODULE(FeedFoward);
+TORCH_MODULE(FeedForward);

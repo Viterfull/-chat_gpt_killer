@@ -26,7 +26,7 @@ batch_size = 50
 ffn_hidden = 2048
 num_heads = 8
 drop_prob = 0.2
-num_layers = 2
+num_layers = 1
 max_sequence_length = 200
 trg_vocab_size = len(trg_vocab)
 
@@ -58,5 +58,16 @@ eng_ru_translator = Transformer(d_model,
                             END_TOKEN, 
                             PADDING_TOKEN)
 
-ru_eng_translator.load_state_dict(torch.load('models/ru_eng_translator.pth'))
-eng_ru_translator.load_state_dict(torch.load('models/eng_ru_translator.pth'))
+ru_eng_translator.load_state_dict(torch.load('models/ru_eng_trans.pth'))
+eng_ru_translator.load_state_dict(torch.load('models/eng_ru_trans.pth'))
+
+def get_device():
+    return torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+device = get_device()
+
+ru_eng_translator.to(device)
+eng_ru_translator.to(device)
+
+ru_eng_translator.eval()
+eng_ru_translator.eval()

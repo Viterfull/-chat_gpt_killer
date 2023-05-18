@@ -228,7 +228,7 @@ def create_translator(src_sentences, trg_sentences, test_sentence, max_sequence_
     ffn_hidden = 2048
     num_heads = 8
     drop_prob = 0.2
-    num_layers = 2
+    num_layers = 1
     max_sequence_length = 200
     trg_vocab_size = len(trg_vocab)
 

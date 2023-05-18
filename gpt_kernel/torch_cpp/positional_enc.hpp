@@ -2,10 +2,10 @@
 
 #include <torch/torch.h>
 
-class PositionalEncoding : public torch::nn::Module {
+class PositionalEncodingImpl : public torch::nn::Module {
 
     public:
-        PositionalEncoding(int64_t d_model, int64_t max_sequence_length)
+        PositionalEncodingImpl(int64_t d_model, int64_t max_sequence_length)
             : max_sequence_length(max_sequence_length), d_model(d_model){}
 
         torch::Tensor forward();
@@ -15,4 +15,4 @@ class PositionalEncoding : public torch::nn::Module {
         int64_t d_model;
 };
 
-TORCH_MODULE(PositionalEncoding)
+TORCH_MODULE(PositionalEncoding);

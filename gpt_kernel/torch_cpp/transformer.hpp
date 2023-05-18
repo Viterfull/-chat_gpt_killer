@@ -6,9 +6,9 @@
 #include "encoder.hpp"
 #include "decoder.hpp"
 
-class Transformer : public torch::nn::Module {
+class TransformerImpl : public torch::nn::Module {
 public:
-    Transformer(int d_model, 
+    TransformerImpl(int d_model, 
                     int ffn_hidden, 
                     int num_heads, 
                     float drop_prob, 
@@ -27,10 +27,10 @@ public:
                           torch::Tensor encoder_self_attention_mask = {},
                           torch::Tensor decoder_self_attention_mask = {},
                           torch::Tensor decoder_cross_attention_mask = {},
-                          bool enc_start_token = false,
-                          bool enc_end_token = false,
-                          bool dec_start_token = false, 
-                          bool dec_end_token = false);
+                          std::string enc_start_token = {},
+                          std::string enc_end_token = {},
+                          std::string dec_start_token = {}, 
+                          std::string dec_end_token = {});
     std::string translate(std::string src_sentence);
 
 private:

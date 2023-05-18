@@ -1,6 +1,6 @@
 #include "transformer.hpp"
 
-TransformerImpl::Transformer(int d_model, 
+TransformerImpl::TransformerImpl(int d_model, 
                                  int ffn_hidden, 
                                  int num_heads, 
                                  float drop_prob, 
@@ -31,15 +31,15 @@ TransformerImpl::Transformer(int d_model,
     register_module("linear", linear_);
 }
 
-torch::Tensor Transformer::forward(torch::Tensor x, 
+torch::Tensor TransformerImpl::forward(torch::Tensor x, 
                                     torch::Tensor y, 
                                     torch::Tensor encoder_self_attention_mask,
                                     torch::Tensor decoder_self_attention_mask,
                                     torch::Tensor decoder_cross_attention_mask,
-                                    bool enc_start_token,
-                                    bool enc_end_token,
-                                    bool dec_start_token, 
-                                    bool dec_end_token) {
+                                    std::string enc_start_token,
+                                    std::string enc_end_token,
+                                    std::string dec_start_token, 
+                                    std::string dec_end_token) {
     x = encoder_->forward(x, encoder_self_attention_mask, enc_start_token, enc_end_token);
     torch::Tensor out = decoder_->forward(x, y, decoder_self_attention_mask, decoder_cross_attention_mask, dec_start_token, dec_end_token);
     out = linear_->forward(out);

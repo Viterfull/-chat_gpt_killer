@@ -4,13 +4,13 @@
 #include <iostream>
 #include <unordered_map>
 #include <string>
+#include "positional_enc.hpp"
 
-
-class SentenceEmbedding : torch::nn::Module {
+class SentenceEmbeddingImpl : torch::nn::Module {
 
     public:
 
-        SentenceEmbedding(int max_sequence_length, int d_model,
+        SentenceEmbeddingImpl(int max_sequence_length, int d_model,
                       const std::unordered_map<std::string, int>& language_to_index,
                       const std::string& START_TOKEN,
                       const std::string& END_TOKEN,
@@ -43,4 +43,4 @@ class SentenceEmbedding : torch::nn::Module {
 
 };
 
-TORCH_MODULE(SentenceEmbedding)
+TORCH_MODULE(SentenceEmbedding);

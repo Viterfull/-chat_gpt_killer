@@ -4,9 +4,9 @@
 #include "multi_head_attention.hpp"
 #include "feed_forward.hpp"
 
-class EncoderLayer : public torch::nn::Module {
+class EncoderLayerImpl : public torch::nn::Module {
 public:
-    EncoderLayer(int d_model, int ffn_hidden, int num_heads, double drop_prob);
+    EncoderLayerImpl(int d_model, int ffn_hidden, int num_heads, double drop_prob);
 
     torch::Tensor forward(torch::Tensor x, torch::Tensor self_attention_mask);
 
@@ -19,4 +19,4 @@ private:
     torch::nn::Dropout dropout2_;
 };
 
-TORCH_MODULE(EncoderLayer)
+TORCH_MODULE(EncoderLayer);

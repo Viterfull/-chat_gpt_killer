@@ -5,9 +5,9 @@
 #include "multi_head_cross_attention.hpp"
 #include "feed_forward.hpp"
 
-class DecoderLayer : public torch::nn::Module {
+class DecoderLayerImpl : public torch::nn::Module {
 public:
-    DecoderLayer(int d_model, int ffn_hidden, int num_heads, float drop_prob);
+    DecoderLayerImpl(int d_model, int ffn_hidden, int num_heads, float drop_prob);
 
     torch::Tensor forward(torch::Tensor x, torch::Tensor y, torch::Tensor self_attention_mask, torch::Tensor cross_attention_mask);
 
@@ -23,4 +23,4 @@ private:
     torch::nn::Dropout dropout3_;
 };
 
-TORCH_MODULE(DecoderLayer)
+TORCH_MODULE(DecoderLayer);

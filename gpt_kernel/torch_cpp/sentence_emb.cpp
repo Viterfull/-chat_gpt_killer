@@ -1,6 +1,6 @@
 #include "sentence_emb.hpp"
 
-torch::Tensor SentenceEmbedding::batch_tokenize(const std::vector<std::string>& batch, bool start_token, bool end_token) {
+torch::Tensor SentenceEmbeddingImpl::batch_tokenize(const std::vector<std::string>& batch, bool start_token, bool end_token) {
     std::vector<torch::Tensor> tokenized;
 
     for (const auto& sentence : batch) {
@@ -29,7 +29,7 @@ torch::Tensor SentenceEmbedding::batch_tokenize(const std::vector<std::string>& 
 
 }
 
-torch::Tensor SentenceEmbedding::forward(const std::vector<std::string>& x, bool start_token, bool end_token) {
+torch::Tensor SentenceEmbeddingImpl::forward(const std::vector<std::string>& x, bool start_token, bool end_token) {
 
     auto tokenized = batch_tokenize(x, start_token, end_token);
     auto embedded = embedding_->forward(tokenized);

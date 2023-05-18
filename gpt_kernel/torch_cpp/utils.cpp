@@ -1,17 +1,16 @@
-#include <utils.hpp>
+#include "utils.hpp"
 
+// const c10::DeviceType get_device() {
 
-torch::Device get_device() {
-
-  if (torch::cuda::is_available()) {
-    return torch::kCUDA;
-  } 
+//   if (torch::cuda::is_available()) {
+//     return torch::kCUDA;
+//   } 
   
-  else {
-    return torch::kCPU;
-  }
+//   else {
+//     return torch::kCPU;
+//   }
 
-}
+// }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> create_masks(
     torch::Tensor eng_batch, torch::Tensor kn_batch) {

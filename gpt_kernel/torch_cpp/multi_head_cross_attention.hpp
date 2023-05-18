@@ -1,11 +1,11 @@
 #pragma once
 
 #include <torch/torch.h>
-#include <utils.hpp>
+#include "utils.hpp"
 
-class MultiHeadCrossAttention : public torch::nn::Module {
+class MultiHeadCrossAttentionImpl : public torch::nn::Module {
 public:
-    MultiHeadCrossAttention(int d_model, int num_heads);
+    MultiHeadCrossAttentionImpl(int d_model, int num_heads);
 
     torch::Tensor forward(torch::Tensor x, torch::Tensor y, torch::Tensor mask);
 
@@ -18,4 +18,4 @@ private:
     torch::nn::Linear linear_layer_;
 };
 
-TORCH_MODULE(MultiHeadCrossAttention)
+TORCH_MODULE(MultiHeadCrossAttention);

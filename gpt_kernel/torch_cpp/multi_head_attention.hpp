@@ -1,9 +1,9 @@
 #pragma once
 
 #include <torch/torch.h>
-#include <utils.hpp>
+#include "utils.hpp"
 
-class MultiHeadAttention : public torch::nn::Module {
+class MultiHeadAttentionImpl : public torch::nn::Module {
 public:
     MultiHeadAttentionImpl(int64_t d_model, int64_t num_heads);
 

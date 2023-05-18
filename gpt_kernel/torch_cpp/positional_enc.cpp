@@ -1,6 +1,6 @@
 #include "positional_enc.hpp"
 
-torch::Tensor PositionalEncoding::forward() {
+torch::Tensor PositionalEncodingImpl::forward() {
 
     torch::Tensor even_i = torch::arange(0, d_model, 2, torch::kFloat);
     torch::Tensor denominator = torch::pow(10000, even_i / d_model);

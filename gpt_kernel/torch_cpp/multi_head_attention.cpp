@@ -9,7 +9,7 @@ MultiHeadAttentionImpl::MultiHeadAttention(int64_t d_model, int64_t num_heads)
 
 }
 
-torch::Tensor MultiHeadAttention::forward(torch::Tensor x, torch::Tensor mask) {
+torch::Tensor MultiHeadAttentionImpl::forward(torch::Tensor x, torch::Tensor mask) {
 
     auto sizes = x.sizes();
     int64_t B = sizes[0];

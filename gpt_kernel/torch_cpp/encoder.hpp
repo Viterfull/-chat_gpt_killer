@@ -1,14 +1,14 @@
 #pragma once
 
 #include <torch/torch.h>
-#include "sentence_embedding.hpp"
+#include "sentence_emb.hpp"
 #include "sequential_encoder.hpp"
 #include "encoder_layer.hpp"
 
-class Encoder : public torch::nn::Module {
+class EncoderImpl : public torch::nn::Module {
 
 public:
-    Encoder(int d_model, int ffn_hidden, int num_heads, float drop_prob,
+    EncoderImpl(int d_model, int ffn_hidden, int num_heads, float drop_prob,
             int num_layers, int max_sequence_length, std::unordered_map<std::string, int> language_to_index,
             std::string START_TOKEN, std::string END_TOKEN, std::string PADDING_TOKEN);
 
@@ -21,4 +21,4 @@ private:
     
 };
 
-TORCH_MODULE(Encoder)
+TORCH_MODULE(Encoder);

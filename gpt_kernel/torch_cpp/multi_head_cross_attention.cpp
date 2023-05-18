@@ -1,6 +1,6 @@
 #include "multi_head_cross_attention.hpp"
 
-MultiHeadCrossAttention::MultiHeadCrossAttention(int d_model, int num_heads)
+MultiHeadCrossAttentionImpl::MultiHeadCrossAttentionImpl(int d_model, int num_heads)
     : d_model_(d_model),
       num_heads_(num_heads),
       head_dim_(d_model / num_heads),
@@ -8,7 +8,7 @@ MultiHeadCrossAttention::MultiHeadCrossAttention(int d_model, int num_heads)
       q_layer_(d_model, d_model),
       linear_layer_(d_model, d_model) {}
 
-torch::Tensor MultiHeadCrossAttention::forward(torch::Tensor x, torch::Tensor y, torch::Tensor mask) {
+torch::Tensor MultiHeadCrossAttentionImpl::forward(torch::Tensor x, torch::Tensor y, torch::Tensor mask) {
     int batch_size = x.size(0);
     int sequence_length = x.size(1);
     torch::Tensor kv = kv_layer_->forward(x);
