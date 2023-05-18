@@ -75,4 +75,8 @@ eng_ru_translator.eval()
 dict_for_models = {'ru->en': ru_eng_translator, 'en->ru': eng_ru_translator}
 
 def translate(s, lend_from, lend_to):
+    if not lend_to or not lend_from:
+        return "Пожалуйста, выберите язык"
+    if lend_from == lend_to:
+        return s
     return dict_for_models[lend_from+'->'+lend_to].translate(s)
