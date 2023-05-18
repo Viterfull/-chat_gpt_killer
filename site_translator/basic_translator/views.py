@@ -2,7 +2,13 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render
 from django_ajax.decorators import ajax
 from .forms import InputForm, SelectForm_to, SelectForm_from
-from .utils import translate
+
+import sys
+
+
+sys.path.append('/home/grigoriy/killer/chat_gpt_killer/gpt_kernel/')
+from load_models import translate
+
 
 def index(request):
     input_form = InputForm()

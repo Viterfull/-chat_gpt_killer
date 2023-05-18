@@ -1,4 +1,4 @@
-from .utils import languages
+languages = ['123', '123']
 from django import forms
 
 class InputForm(forms.Form):

@@ -58,8 +58,8 @@ eng_ru_translator = Transformer(d_model,
                             END_TOKEN, 
                             PADDING_TOKEN)
 
-ru_eng_translator.load_state_dict(torch.load('models/ru_eng_trans.pth'))
-eng_ru_translator.load_state_dict(torch.load('models/eng_ru_trans.pth'))
+ru_eng_translator.load_state_dict(torch.load('/home/grigoriy/killer/chat_gpt_killer/gpt_kernel/models/ru_eng_trans.pth', map_location=torch.device('cpu')))
+eng_ru_translator.load_state_dict(torch.load('/home/grigoriy/killer/chat_gpt_killer/gpt_kernel/models/eng_ru_trans.pth', map_location=torch.device('cpu')))
 
 def get_device():
     return torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -71,3 +71,8 @@ eng_ru_translator.to(device)
 
 ru_eng_translator.eval()
 eng_ru_translator.eval()
+
+dict_for_models = {'ru->en': ru_eng_translator, 'en->ru': eng_ru_translator}
+
+def translate(s, lend_from, lend_to):
+    return dict_for_models[lend_from+'->'+lend_to].translate(s)
