@@ -99,12 +99,13 @@ select{
 .about ul{
     color: whitesmoke;
     font-size: 20px;
+    text-align: left;
 }
 
 .Dima{
     display: inline-block;
     width: 400px;
-    height: 150px;
+    height: 400px;
     margin-right: 20px;
     font-size: 10px;
 }
@@ -112,7 +113,7 @@ select{
 .Grisha{
     display: inline-block;
     width: 400px;
-    height: 150px;
+    height: 400px;
     margin-right: 20px;
     font-size: 10px;
 }
@@ -120,7 +121,7 @@ select{
 .Misha{
     display: inline-block;
     width: 400px;
-    height: 150px;
+    height: 400px;
     margin-right: 20px;
     font-size: 10px;
 }
