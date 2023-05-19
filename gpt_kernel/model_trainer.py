@@ -178,8 +178,8 @@ def create_translator(src_sentences, trg_sentences, test_sentence, max_sequence_
     PADDING_TOKEN = '<PADDING>'
     END_TOKEN = '<END>'
 
-    trg_vocab = list(set(' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ1234567890.,#!@"$;:^|\'-=+_—?<>'))
-    src_vocab = list(set(' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ1234567890.,#!@"$;:^|\'-=+_—?<>'))
+    trg_vocab = sorted(list(set(' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ1234567890.,#!@"$;:^|\'-=+_—?<>')))
+    src_vocab = sorted(list(set(' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ1234567890.,#!@"$;:^|\'-=+_—?<>')))
 
     # trg_vocab = set()
     # src_vocab = set()

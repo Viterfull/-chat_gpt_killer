@@ -31,7 +31,7 @@ public:
                           std::string enc_end_token = {},
                           std::string dec_start_token = {}, 
                           std::string dec_end_token = {});
-    std::string translate(std::string src_sentence);
+    // std::string translate(std::string src_sentence);
 
 private:
     int max_sequence_length_;

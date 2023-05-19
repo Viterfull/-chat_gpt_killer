@@ -47,36 +47,36 @@ torch::Tensor TransformerImpl::forward(torch::Tensor x,
     return out;
 }
 
-std::string TransformerImpl::translate(std::string src_sentence) {
+// std::string TransformerImpl::translate(std::string src_sentence) {
 
-    eval();
-    int max_sequence_length = max_sequence_length_;
-    torch::Device device = device_;
-    std::vector<std::string> src_sentence_vec = {src_sentence};
-    std::vector<std::string> trg_sentence_vec = {""};
+//     eval();
+//     int max_sequence_length = max_sequence_length_;
+//     torch::Device device = device_;
+//     std::vector<std::string> src_sentence_vec = {src_sentence};
+//     std::vector<std::string> trg_sentence_vec = {""};
     
-    for (int word_counter = 0; word_counter < max_sequence_length; word_counter++) {
+//     for (int word_counter = 0; word_counter < max_sequence_length; word_counter++) {
         
-        torch::Tensor encoder_self_attention_mask, decoder_self_attention_mask, decoder_cross_attention_mask;
-        std::tie(encoder_self_attention_mask, decoder_self_attention_mask, decoder_cross_attention_mask) = create_masks(src_sentence_vec, trg_sentence_vec);
-        torch::Tensor predictions = forward(torch::tensor(src_sentence_vec), 
-                                             torch::tensor(trg_sentence_vec), 
-                                             encoder_self_attention_mask.to(device), 
-                                             decoder_self_attention_mask.to(device), 
-                                             decoder_cross_attention_mask.to(device),
-                                             false,
-                                             false,
-                                             true,
-                                             false);
-        torch::Tensor next_token_prob_distribution = predictions[0][word_counter];
-        int next_token_index = at::argmax(next_token_prob_distribution).item<int>();
-        std::string next_token = index_to_trg_[next_token_index];
+//         torch::Tensor encoder_self_attention_mask, decoder_self_attention_mask, decoder_cross_attention_mask;
+//         std::tie(encoder_self_attention_mask, decoder_self_attention_mask, decoder_cross_attention_mask) = create_masks(torch::Tensor(src_sentence_vec), tprctrg_sentence_vec);
+//         torch::Tensor predictions = forward(torch::tensor(src_sentence_vec), 
+//                                              torch::tensor(trg_sentence_vec), 
+//                                              encoder_self_attention_mask.to(device), 
+//                                              decoder_self_attention_mask.to(device), 
+//                                              decoder_cross_attention_mask.to(device),
+//                                              false,
+//                                              false,
+//                                              true,
+//                                              false);
+//         torch::Tensor next_token_prob_distribution = predictions[0][word_counter];
+//         int next_token_index = at::argmax(next_token_prob_distribution).item<int>();
+//         std::string next_token = index_to_trg_[next_token_index];
 
-        if (next_token == END_TOKEN_) {
-            break;
-        }
+//         if (next_token == END_TOKEN_) {
+//             break;
+//         }
 
-        trg_sentence_vec[0] += next_token;
-    }
-    return trg_sentence_vec[0];
-}
+//         trg_sentence_vec[0] += next_token;
+//     }
+//     return trg_sentence_vec[0];
+// }
