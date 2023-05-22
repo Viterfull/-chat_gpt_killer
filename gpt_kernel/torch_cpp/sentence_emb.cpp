@@ -32,9 +32,9 @@ torch::Tensor SentenceEmbeddingImpl::batch_tokenize(const std::vector<std::strin
 torch::Tensor SentenceEmbeddingImpl::forward(const std::vector<std::string>& x, bool start_token, bool end_token) {
 
     auto tokenized = batch_tokenize(x, start_token, end_token);
-    auto embedded = embedding_->forward(tokenized);
-    auto pos = position_encoder_->forward().to(at::kCUDA)
-    auto dropout_output = dropout_->forward(embedded + pos);
+    auto embedded = embedding_.forward(tokenized);
+    auto pos = position_encoder_.forward().to(at::kCUDA)
+    auto dropout_output = dropout_.forward(embedded + pos);
 
     return dropout_output;
 }

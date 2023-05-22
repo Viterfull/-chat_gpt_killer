@@ -7,18 +7,18 @@
 
 class DecoderLayerImpl : public torch::nn::Module {
 public:
-    DecoderLayerImpl(int d_model, int ffn_hidden, int num_heads, float drop_prob);
+    DecoderLayerImpl(int64_t d_model, int ffn_hidden, int num_heads, float drop_prob);
 
     torch::Tensor forward(torch::Tensor x, torch::Tensor y, torch::Tensor self_attention_mask, torch::Tensor cross_attention_mask);
 
 private:
-    MultiHeadAttention self_attention_;
+    MultiHeadAttentionImpl self_attention_;
     torch::nn::LayerNorm layer_norm1_;
     torch::nn::Dropout dropout1_;
-    MultiHeadCrossAttention encoder_decoder_attention_;
+    MultiHeadCrossAttentionImpl encoder_decoder_attention_;
     torch::nn::LayerNorm layer_norm2_;
     torch::nn::Dropout dropout2_;
-    FeedForward ffn_;
+    FeedForwardImpl ffn_;
     torch::nn::LayerNorm layer_norm3_;
     torch::nn::Dropout dropout3_;
 };

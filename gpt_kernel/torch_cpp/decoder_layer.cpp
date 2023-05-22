@@ -1,17 +1,17 @@
 #include "decoder_layer.hpp"
 
-DecoderLayer::DecoderLayer(int d_model, int ffn_hidden, int num_heads, float drop_prob)
+DecoderLayerImpl::DecoderLayerImpl(int64_t d_model, int ffn_hidden, int num_heads, float drop_prob)
     : self_attention_(d_model, num_heads),
-      layer_norm1_(d_model),
+      layer_norm1_(torch::nn::LayerNormOptions({d_model})),
       dropout1_(drop_prob),
       encoder_decoder_attention_(d_model, num_heads),
-      layer_norm2_(d_model),
+      layer_norm2_(torch::nn::LayerNormOptions({d_model})),
       dropout2_(drop_prob),
       ffn_(d_model, ffn_hidden, drop_prob),
-      layer_norm3_(d_model),
+      layer_norm3_(torch::nn::LayerNormOptions({d_model})),
       dropout3_(drop_prob) {}
 
-torch::Tensor DecoderLayer::forward(torch::Tensor x, torch::Tensor y, torch::Tensor self_attention_mask, torch::Tensor cross_attention_mask) {
+torch::Tensor DecoderLayerImpl::forward(torch::Tensor x, torch::Tensor y, torch::Tensor self_attention_mask, torch::Tensor cross_attention_mask) {
     
     torch::Tensor _y = y.clone();
     y = self_attention_.forward(y, self_attention_mask);

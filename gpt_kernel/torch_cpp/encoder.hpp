@@ -16,8 +16,8 @@ public:
                           std::string start_token, std::string end_token);
 
 private:
-    SentenceEmbedding sentence_embedding_;
-    SequentialEncoder layers_;
+    SentenceEmbedding sentence_embedding_{};
+    SequentialEncoder layers_{};
     
 };
 

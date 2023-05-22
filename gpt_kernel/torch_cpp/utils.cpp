@@ -1,17 +1,5 @@
 #include "utils.hpp"
 
-// const c10::DeviceType get_device() {
-
-//   if (torch::cuda::is_available()) {
-//     return torch::kCUDA;
-//   } 
-  
-//   else {
-//     return torch::kCPU;
-//   }
-
-// }
-
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> create_masks(
     torch::Tensor eng_batch, torch::Tensor kn_batch) {
   
@@ -49,7 +37,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> create_masks(
 }
 
 torch::Tensor scaled_dot_product(
-    torch::Tensor q, torch::Tensor k, torch::Tensor v, torch::Tensor mask = torch::Tensor()) {
+    torch::Tensor q, torch::Tensor k, torch::Tensor v, torch::Tensor mask) {
 
   int d_k = q.size(-1);
 

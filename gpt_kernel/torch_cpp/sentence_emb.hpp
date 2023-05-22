@@ -17,10 +17,10 @@ class SentenceEmbeddingImpl : torch::nn::Module {
                       const std::string& PADDING_TOKEN) :
         vocab_size_(language_to_index.size()),
         max_sequence_length_(max_sequence_length),
-        embedding_(torch::nn::EmbeddingOptions(vocab_size_, d_model)),
+        embedding_(register_module("embedding", torch::nn::Embedding(vocab_size_, d_model))),
         language_to_index_(language_to_index),
         position_encoder_(d_model, max_sequence_length),
-        dropout_(torch::nn::DropoutOptions(0.1)),
+        dropout_(register_module("dropout", torch::nn::Dropout(0.1))),
         START_TOKEN_(START_TOKEN),
         END_TOKEN_(END_TOKEN),
         PADDING_TOKEN_(PADDING_TOKEN) {}

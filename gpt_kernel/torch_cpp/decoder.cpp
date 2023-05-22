@@ -5,7 +5,7 @@ DecoderImpl::DecoderImpl(int64_t d_model, int64_t ffn_hidden, int64_t num_heads,
     std::string END_TOKEN, std::string PADDING_TOKEN)
     : sentence_embedding(register_module("sentence_embedding",
         SentenceEmbedding(max_sequence_length, d_model, language_to_index, START_TOKEN, END_TOKEN, PADDING_TOKEN)))
-    , layers(register_module("layers", SequentialDecoder(create_decoder_layers(d_model, ffn_hidden, num_heads, drop_prob, num_layers))))
+    , layers(register_module("layers", SequentialDecoder layers(create_decoder_layers(d_model, ffn_hidden, num_heads, drop_prob, num_layers))))
 {}
 
 torch::Tensor DecoderImpl::forward(torch::Tensor x, torch::Tensor y, torch::Tensor self_attention_mask, torch::Tensor cross_attention_mask,
